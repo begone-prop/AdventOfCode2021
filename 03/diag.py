@@ -2,6 +2,7 @@
 
 with open('input', 'r') as inp:
     data = [i.strip('\n') for i in inp.readlines()]
+
 # Part 1 trivial solution O(n*m)
 dataLen = len(data)
 bitLen = len(data[0])
@@ -14,27 +15,31 @@ for row in data:
 
 gamma = ''.join(list(map(lambda x: '1' if x > tresh else '0', freq)))
 epsilon = ''.join(['0' if y == '1' else '1' for y in gamma])
-##print(int(gamma, 2) * int(epsilon, 2))
-#print(gamma)
+
+print(f'Part 1: {int(gamma, 2) * int(epsilon, 2)}')
 
 # Part Two
-candidates = data
-oxygen = []
+def filterBits(data, fieldLen, bit):
+    candidates = data
+    result = []
 
-for idx in range(bitLen):
-    cur = 0
-    for number in candidates:
-        if number[idx] == '1': cur += 1
+    filt = bit
+    nofilt = '0' if bit == '1' else '1'
+    for idx in range(fieldLen):
+        count = len(candidates)
+        threshold = count // 2
+        freq = sum([int(line[idx]) for line in candidates])
+        common = filt if freq > threshold else nofilt
+        if freq * 2 == count: common = filt
 
-    mostCommon = '1' if cur >= len(candidates) // 2 else '0'
+        result = [bit for bit in candidates if bit[idx] == common]
 
-    for number in candidates:
-        if number[idx] == mostCommon:
-            oxygen.append(number)
+        if len(result) == 1: break
+        candidates = result
+        result = []
 
-    if len(oxygen) == 1: break
-    candidates = oxygen
-    oxygen = []
+    return int("".join(result), 2)
 
-print(oxygen)
-print(int(''.join(oxygen), 2))
+oxygen = filterBits(data, bitLen, '1')
+co2 = filterBits(data, bitLen, '0')
+print(f'Part 2: {oxygen * co2}')
