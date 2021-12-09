@@ -7,7 +7,7 @@ numbers = [int(x) for x in data[0].split(',')]
 
 def getBoards(inp):
     result = []
-    inpBoards = data[1:]
+    inpBoards = inp[1:]
     dataLen = len(inpBoards)
     tempBoard = []
 
@@ -24,17 +24,28 @@ def getBoards(inp):
 
     return result
 
-def getColumn(boards, x, y):
-    return [column[y] for column in boards[x]]
+
+def play(bingoBoards, draws):
+    for number in draws:
+        for idx, board in enumerate(bingoBoards):
+            for jdx, row in enumerate(board):
+                for zdx, element in enumerate(row):
+                    if element == number:
+                        bingoBoards[idx][jdx][zdx] = -1
+                        if sum(row) == -fieldLen or sum([rw[jdx] for rw in board]) == -fieldLen:
+                            return number, idx
+    return -1, -1
 
 boards = getBoards(data)
-fieldLen = len(boards[0][0])
+lookup = getBoards(data)
 
-for idx, number in enumerate(numbers):
-    if idx < fieldLen: continue
-    for board in boards:
-        canditates = set(numbers[:idx])
-        for jdx, row in enumerate(board):
-            if set(row).issubset(canditates):
-                print('True')
-                break
+fieldLen = len(boards[0][0])
+num, index = play(boards, numbers)
+
+s = 0
+
+for a, b in zip(boards[index], lookup[index]):
+    for x, y in zip(a, b):
+        if x != -1: s += y
+
+print(s, num, s * num)
