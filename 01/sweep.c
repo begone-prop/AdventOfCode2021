@@ -43,7 +43,7 @@ void insertVint(ListInt *vect, int value) {
 }
 
 int main(int argc, char **argv) {
-    const char *path = "./input";
+    const char *path = argv[1];
     int fd = open(path, O_RDONLY);
     ListInt nums = createListInt(100);
 
