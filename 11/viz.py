@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+import raylib
+
 def readInput(fileName: str) -> list[list[int]]:
     result = []
     with open(fileName, 'r') as inp:
@@ -15,15 +17,6 @@ def printOctos(octos) -> None:
     for row in octos:
         print(row)
 
-octopi = readInput('input')
-neigh = range(-1, 2)
-simulate = True
-flashed = False
-flashes = 0
-firstSync = -1
-
-step = 0
-maxStep = 100
 
 def isNeighbour(i, j, a, b, maxIdx):
     if i + a > maxIdx or j + b > maxIdx:
@@ -37,7 +30,27 @@ def isNeighbour(i, j, a, b, maxIdx):
 
     return True
 
-while simulate:
+WIDTH = 1000
+HEIGHT = 1000
+
+neigh = range(-1, 2)
+flashes = 0
+
+step = 0
+maxStep = 10000000000
+raylib.InitWindow(WIDTH, HEIGHT, b'Dumb Octopi')
+
+raylib.SetTargetFPS(30)
+octopi = readInput('./medium')
+fieldLen = len(octopi[0])
+offsetX = WIDTH // fieldLen
+offsetY = HEIGHT // fieldLen
+
+while not raylib.WindowShouldClose():
+    flashed = False
+    raylib.BeginDrawing()
+
+    raylib.ClearBackground(raylib.BLACK)
     for idx, row in enumerate(octopi):
         for jdx, number in enumerate(row):
             octopi[idx][jdx] += 1
@@ -61,17 +74,19 @@ while simulate:
     for idx, row in enumerate(octopi):
         for jdx, number in enumerate(row):
             if octopi[idx][jdx] == -1:
+                raylib.DrawRectangle(offsetX * idx, offsetY * jdx, offsetX, offsetY, raylib.RED)
                 octopi[idx][jdx] = 0
+            else:
+                nf = raylib.ColorAlpha(raylib.RED, 1 / float(octopi[idx][jdx]))
+                raylib.DrawRectangle(offsetX * idx, offsetY * jdx, offsetX, offsetY, nf)
 
     step += 1
 
-    if sum([sum(row) for row in octopi]) == 0:
-        firstSync = step
+    if step >= maxStep:
         break
 
-    if step >= maxStep:
-        simulate = False
+    raylib.EndDrawing()
 
-printOctos(octopi)
-print(flashes)
-print(firstSync)
+raylib.CloseWindow()
+# printOctos(octopi)
+# print(flashes)
